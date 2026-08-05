@@ -211,6 +211,29 @@
   .btn-secondary{background:var(--surface); color:var(--text);}
   .btn-primary{background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#08201c; border:none;}
 
+  /* GENERADOR AUTOMÁTICO */
+  .gen-toggle-btn{
+    width:100%; padding:14px; border-radius:12px; border:1px dashed var(--accent); background:rgba(47,184,174,.08);
+    color:var(--accent); font-weight:700; font-size:13.5px; cursor:pointer; margin-bottom:14px;
+  }
+  .gen-panel{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:16px; margin-bottom:16px; display:none;
+  }
+  .gen-panel.open{display:block;}
+  .gen-block{margin-bottom:14px;}
+  .gen-block:last-child{margin-bottom:0;}
+  .gen-label{font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; font-weight:700; margin-bottom:8px; display:block;}
+  .gen-row{display:flex; flex-wrap:wrap; gap:8px;}
+  .gen-num{display:flex; align-items:center; gap:10px;}
+  .gen-num input[type=range]{flex:1; accent-color:var(--accent);}
+  .gen-num-val{min-width:44px; text-align:center; font-weight:700; font-size:13px; background:var(--bg-alt); border-radius:8px; padding:6px 4px;}
+  .gen-generate-btn{
+    width:100%; padding:14px; border-radius:12px; border:none; font-weight:700; font-size:14.5px; cursor:pointer;
+    background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#08201c; margin-top:6px;
+  }
+  .gen-note{font-size:11px; color:var(--text-muted); margin-top:8px; line-height:1.5;}
+
   .saved-section{margin-top:26px;}
   .saved-item{
     background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:12px 14px;
@@ -329,6 +352,80 @@
     <div class="routine-header">
       <input type="text" id="routineName" placeholder="Nombre de la rutina (ej. Full Body - Cliente X)">
     </div>
+
+    <button class="gen-toggle-btn" onclick="toggleGenPanel()" id="genToggleBtn">🎯 Generar rutina automática</button>
+    <div class="gen-panel" id="genPanel">
+      <div class="gen-block">
+        <span class="gen-label">Lugar de entrenamiento</span>
+        <div class="gen-row">
+          <div class="chip active" data-genf="lugar" data-val="ambos" onclick="setGenSingle(this)">Ambos</div>
+          <div class="chip" data-genf="lugar" data-val="casa" onclick="setGenSingle(this)">🏠 Casa</div>
+          <div class="chip" data-genf="lugar" data-val="gym" onclick="setGenSingle(this)">🏋️ Gimnasio</div>
+        </div>
+      </div>
+
+      <div class="gen-block">
+        <span class="gen-label">Nivel</span>
+        <div class="gen-row">
+          <div class="chip" data-genf="nivel" data-val="principiante" onclick="setGenSingle(this)">Principiante</div>
+          <div class="chip active" data-genf="nivel" data-val="intermedio" onclick="setGenSingle(this)">Intermedio</div>
+          <div class="chip" data-genf="nivel" data-val="avanzado" onclick="setGenSingle(this)">Avanzado</div>
+        </div>
+      </div>
+
+      <div class="gen-block">
+        <span class="gen-label">Objetivo / grupo muscular</span>
+        <div class="gen-row">
+          <div class="chip active" data-genf="objetivo" data-val="full" onclick="setGenSingle(this)">Full Body</div>
+          <div class="chip" data-genf="objetivo" data-val="superior" onclick="setGenSingle(this)">Tren superior</div>
+          <div class="chip" data-genf="objetivo" data-val="inferior" onclick="setGenSingle(this)">Tren inferior</div>
+          <div class="chip" data-genf="objetivo" data-val="core" onclick="setGenSingle(this)">Core</div>
+          <div class="chip" data-genf="objetivo" data-val="cardio" onclick="setGenSingle(this)">Cardio</div>
+        </div>
+      </div>
+
+      <div class="gen-block">
+        <span class="gen-label">Tiempo disponible: <span id="genTiempoVal">45 min</span></span>
+        <div class="gen-num">
+          <input type="range" id="genTiempo" min="10" max="90" step="5" value="45" oninput="onGenTiempoChange(this.value)">
+        </div>
+      </div>
+
+      <div class="gen-block">
+        <span class="gen-label">Cantidad de ejercicios: <span id="genCantVal">8</span></span>
+        <div class="gen-num">
+          <input type="range" id="genCant" min="3" max="15" step="1" value="8" oninput="onGenCantChange(this.value)">
+        </div>
+      </div>
+
+      <div class="gen-block">
+        <span class="gen-label">Molestias / lesiones (selección múltiple)</span>
+        <div class="gen-row">
+          <div class="chip" data-genf="lesion" data-val="rodilla" onclick="toggleGenMulti(this)">Rodilla</div>
+          <div class="chip" data-genf="lesion" data-val="hombro" onclick="toggleGenMulti(this)">Hombro</div>
+          <div class="chip" data-genf="lesion" data-val="lumbar" onclick="toggleGenMulti(this)">Espalda baja</div>
+          <div class="chip" data-genf="lesion" data-val="munecacodo" onclick="toggleGenMulti(this)">Muñeca/Codo</div>
+          <div class="chip" data-genf="lesion" data-val="cuello" onclick="toggleGenMulti(this)">Cuello</div>
+          <div class="chip" data-genf="lesion" data-val="cadera" onclick="toggleGenMulti(this)">Cadera</div>
+          <div class="chip" data-genf="lesion" data-val="tobillo" onclick="toggleGenMulti(this)">Tobillo</div>
+        </div>
+      </div>
+
+      <div class="gen-block">
+        <span class="gen-label">Formato de entrenamiento</span>
+        <div class="gen-row">
+          <div class="chip active" data-genf="formato" data-val="series" onclick="setGenSingle(this)">Series</div>
+          <div class="chip" data-genf="formato" data-val="circuito" onclick="setGenSingle(this)">Circuito</div>
+          <div class="chip" data-genf="formato" data-val="emom" onclick="setGenSingle(this)">EMOM</div>
+          <div class="chip" data-genf="formato" data-val="amrap" onclick="setGenSingle(this)">AMRAP</div>
+          <div class="chip" data-genf="formato" data-val="tabata" onclick="setGenSingle(this)">Tabata</div>
+        </div>
+      </div>
+
+      <button class="gen-generate-btn" onclick="generateRoutine()">✨ Generar y agregar a mi rutina</button>
+      <div class="gen-note">Se agrega a la rutina actual (no borra lo que ya tengas). Podés editar series/reps/descanso después de generar.</div>
+    </div>
+
     <div class="routine-list" id="routineList"></div>
     <div class="empty-state" id="routineEmpty" style="display:none;">
       Aún no agregaste ejercicios.<br>Andá a la Enciclopedia y tocá el "+" en cualquier ejercicio.
@@ -524,6 +621,198 @@ function addToRoutine(idx, fromModal){
 
 function updateRoutineCount(){
   document.getElementById('routineCount').textContent = state.routine.length;
+}
+
+/* ============ GENERADOR AUTOMÁTICO DE RUTINAS (100% offline, basado en reglas) ============ */
+
+const genState = {
+  lugar:'ambos', nivel:'intermedio', objetivo:'full',
+  tiempo:45, cantidad:8, lesiones:[], formato:'series'
+};
+
+// Grupos musculares macro, mapeados a los valores "mp" del dataset
+const MUSCLE_GROUPS = {
+  superior:['Pectoral','Espalda','Dorsales','Hombro','Hombro Anterior','Hombro Medial','Hombro Posterior','Bíceps','Triceps','Trapecio','Antebrazo'],
+  inferior:['Cuádriceps','Femorales','Glúteo','Aductores','Abductores','Gemelos','Tibiales','Cadera','Psoas'],
+  core:['Abdominales','Oblicuos'],
+  cardio:['Cardiovascular','Músculos explosivos','Multiples','Equilibrio']
+};
+
+// Qué grupos "mp" evitar (o priorizar en modo rehab) según la molestia/lesión seleccionada
+const INJURY_MUSCLES = {
+  rodilla:['Cuádriceps','Femorales','Gemelos','Tibiales'],
+  hombro:['Hombro','Hombro Anterior','Hombro Medial','Hombro Posterior','Trapecio'],
+  lumbar:['Espalda','Psoas'],
+  munecacodo:['Antebrazo','Bíceps','Triceps'],
+  cuello:['Cuello','Trapecio'],
+  cadera:['Cadera','Aductores','Abductores','Psoas','Glúteo'],
+  tobillo:['Gemelos','Tibiales']
+};
+
+// Palabras clave que delatan ejercicios de alta exigencia técnica/explosiva (para filtrar nivel principiante)
+const ADVANCED_KEYWORDS = ['salto','explosiv','pliomé','burpee','arrancada','lastrad','sprint','snatch','clean','battle rope','box jump'];
+
+function toggleGenPanel(){
+  const panel = document.getElementById('genPanel');
+  panel.classList.toggle('open');
+  document.getElementById('genToggleBtn').textContent = panel.classList.contains('open') ? '✕ Cerrar generador' : '🎯 Generar rutina automática';
+}
+
+function setGenSingle(el){
+  const f = el.dataset.genf;
+  document.querySelectorAll(`.chip[data-genf="${f}"]`).forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  genState[f] = el.dataset.val;
+}
+
+function toggleGenMulti(el){
+  const val = el.dataset.val;
+  el.classList.toggle('active');
+  if(genState.lesiones.includes(val)){
+    genState.lesiones = genState.lesiones.filter(v=>v!==val);
+  } else {
+    genState.lesiones.push(val);
+  }
+}
+
+function onGenTiempoChange(v){
+  genState.tiempo = Number(v);
+  document.getElementById('genTiempoVal').textContent = v + ' min';
+}
+
+function onGenCantChange(v){
+  genState.cantidad = Number(v);
+  document.getElementById('genCantVal').textContent = v;
+}
+
+// Devuelve el set de músculos (mp) a evitar en ejercicios "normales" según las lesiones activas
+function getExcludedMuscles(){
+  const set = new Set();
+  genState.lesiones.forEach(les=>{
+    (INJURY_MUSCLES[les]||[]).forEach(m=>set.add(m));
+  });
+  return set;
+}
+
+function isAdvancedExercise(e){
+  const txt = (e.n + ' ' + e.mp).toLowerCase();
+  return ADVANCED_KEYWORDS.some(k=>txt.includes(k)) || e.mp === 'Músculos explosivos';
+}
+
+function passesPlaceFilter(e){
+  if(genState.lugar==='casa') return e.casa;
+  if(genState.lugar==='gym') return e.gym;
+  return e.casa || e.gym; // ambos
+}
+
+function buildExercisePool(){
+  const excluded = getExcludedMuscles();
+  const normalPool = []; // ejercicios seguros y aptos
+  const rehabSubs = {};  // sustitutos de rehab por músculo excluido, por si hacen falta
+
+  EXERCISES.forEach(e=>{
+    if(!e.mp) return;
+    if(e.estir) return; // los estiramientos quedan fuera del generador de rutinas de trabajo
+    if(!passesPlaceFilter(e)) return;
+    if(genState.nivel==='principiante' && isAdvancedExercise(e)) return;
+
+    const touchesExcluded = excluded.has(e.mp) || excluded.has(e.ms);
+    if(touchesExcluded){
+      if(e.rehab){
+        // ejercicio de rehab que sí toca la zona: guardarlo como sustituto seguro, no como ejercicio normal
+        if(!rehabSubs[e.mp]) rehabSubs[e.mp] = [];
+        rehabSubs[e.mp].push(e);
+      }
+      return; // se excluye del pool normal
+    }
+    normalPool.push(e);
+  });
+
+  return {normalPool, rehabSubs};
+}
+
+// Reparte la cantidad de ejercicios entre los grupos musculares macro según el objetivo elegido
+function getTargetGroups(){
+  if(genState.objetivo==='full') return ['superior','inferior','core'];
+  if(genState.objetivo==='cardio') return ['cardio'];
+  return [genState.objetivo];
+}
+
+function generateRoutine(){
+  const {normalPool, rehabSubs} = buildExercisePool();
+  const groups = getTargetGroups();
+
+  // Agrupar el pool por macro-grupo
+  const poolByGroup = {};
+  groups.forEach(g=>{ poolByGroup[g] = normalPool.filter(e=> MUSCLE_GROUPS[g].includes(e.mp)); });
+
+  const picked = [];
+  const usedNames = new Set();
+  let gi = 0;
+  let attempts = 0;
+  const maxAttempts = genState.cantidad * 20;
+
+  while(picked.length < genState.cantidad && attempts < maxAttempts){
+    attempts++;
+    const g = groups[gi % groups.length];
+    gi++;
+    const pool = poolByGroup[g];
+    if(pool && pool.length){
+      const idx = Math.floor(Math.random()*pool.length);
+      const ex = pool[idx];
+      if(!usedNames.has(ex.n)){
+        usedNames.add(ex.n);
+        picked.push(ex);
+      }
+    }
+  }
+
+  // Si por las restricciones (lesiones muy amplias) faltan ejercicios, rellenar con sustitutos de rehab
+  if(picked.length < genState.cantidad){
+    const subsFlat = Object.values(rehabSubs).flat();
+    for(const ex of subsFlat){
+      if(picked.length >= genState.cantidad) break;
+      if(!usedNames.has(ex.n)){
+        usedNames.add(ex.n);
+        picked.push(ex);
+      }
+    }
+  }
+
+  if(picked.length===0){
+    showToast('No hay ejercicios que cumplan esos filtros. Probá ampliar lugar o quitar alguna lesión.');
+    return;
+  }
+
+  // Asignar series/reps/descanso según el formato y tiempo disponible
+  const totalSeconds = genState.tiempo * 60;
+  const perExercise = Math.max(totalSeconds / picked.length, 30);
+  let series, reps, descanso;
+
+  if(genState.formato==='circuito'){
+    series = 3; reps = 15; descanso = 20;
+  } else if(genState.formato==='emom'){
+    series = Math.max(Math.round(genState.tiempo), picked.length); reps = 12; descanso = 0;
+  } else if(genState.formato==='amrap'){
+    series = 1; reps = 0; descanso = 0; // 0 reps = "AMRAP" -> el usuario ajusta a gusto
+  } else if(genState.formato==='tabata'){
+    series = 8; reps = 0; descanso = 10;
+  } else { // series tradicionales
+    series = 3;
+    reps = genState.nivel==='principiante' ? 12 : (genState.nivel==='avanzado' ? 8 : 10);
+    descanso = Math.max(30, Math.min(90, Math.round((perExercise - (series*8)) / series)));
+  }
+
+  picked.forEach(ex=>{
+    if(state.routine.some(r=>r.n===ex.n)) return; // evita duplicar si ya estaba en la rutina
+    state.routine.push({n:ex.n, img:ex.img, mp:ex.mp, series, reps, descanso});
+  });
+
+  updateRoutineCount();
+  renderRoutine();
+  document.getElementById('genPanel').classList.remove('open');
+  document.getElementById('genToggleBtn').textContent = '🎯 Generar rutina automática';
+  showToast(`✅ ${picked.length} ejercicios agregados a tu rutina`);
 }
 
 function switchTab(tab){
